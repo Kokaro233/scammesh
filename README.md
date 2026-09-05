@@ -4,7 +4,7 @@ Cross-channel scam defense powered by concurrent agents.
 
 This repository is a **Hackathon prototype**. It performs **no real financial actions**.
 
-Phase 3 can run without an LLM key via `MOCK_INFERENCE_MODE=true`. Leave `LLM_*` empty. Business agents are not implemented yet.
+Phase 4 runs Call Agent and Message Agent concurrently on Mozaik. Keep `MOCK_INFERENCE_MODE=true`. The remaining four agents are not implemented yet.
 
 ## Getting started
 

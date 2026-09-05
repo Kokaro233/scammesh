@@ -1,3 +1,3 @@
 # Architecture
 
-Phase 3 adds a single ScamMesh inference adapter. `MOCK_INFERENCE_MODE=true` or empty LLM placeholders stay on a deterministic mock. No vendor SDKs are imported. Business agents are not implemented yet.
+Phase 4 adds Call Agent and Message Agent on the official Mozaik v4 runtime. Message starts in NORMAL, switches to HEIGHTENED when Call emits `coercion_detected`, and re-checks the same SMS. Other business agents are not implemented yet.
