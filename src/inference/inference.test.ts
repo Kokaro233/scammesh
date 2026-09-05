@@ -118,4 +118,34 @@ describe("inference adapter", () => {
 
 		expect(provider).toBeInstanceOf(MockInferenceProvider)
 	})
+
+	it("falls back to mock when the LLM provider throws or returns HTTP 500", async () => {
+		const env = readInferenceEnv({
+			LLM_PROVIDER: "openai-compatible",
+			LLM_API_KEY: "placeholder-not-a-real-key",
+			LLM_MODEL: "gpt-5.5",
+			LLM_BASE_URL: "https://example.invalid/v1",
+			MOCK_INFERENCE_MODE: "false",
+		})
+		const input = { channel: "call" as const, payload: callCoercionFromMain() }
+		const context = { agentId: "call" as const, channel: "call" as const, mode: "NORMAL" as const, registry }
+
+		const network = new LlmInferenceProvider(env, mock, async () => {
+			throw new Error("ECONNREFUSED")
+		})
+		const http = new LlmInferenceProvider(env, mock, async () => new Response("provider down", { status: 500 }))
+
+		const networkResult = await network.analyze(input, ANALYSIS_SCHEMA, context)
+		const httpResult = await http.analyze(input, ANALYSIS_SCHEMA, context)
+		const cardLines = (result: typeof networkResult) => result.detections.map((item) => `${item.type}: ${item.summary}`)
+
+		expect(networkResult.usedFallback).toBe(true)
+		expect(httpResult.usedFallback).toBe(true)
+		expect(networkResult.provider).toBe("mock")
+		expect(httpResult.provider).toBe("mock")
+		expect(networkResult.detections.some((item) => item.type === "coercion_detected")).toBe(true)
+		expect(() => cardLines(networkResult)).not.toThrow()
+		expect(() => cardLines(httpResult)).not.toThrow()
+	})
 })
+

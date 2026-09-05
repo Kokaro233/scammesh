@@ -4,7 +4,7 @@ Cross-channel scam defense powered by concurrent agents.
 
 This repository is a **Hackathon prototype**. It performs **no real financial actions**.
 
-Phase 11 adds Evidence and Action pages. Evidence traces who produced each event and who used it. Action only recommends human checks. Restart Demo replays the same scenario. Keep `MOCK_INFERENCE_MODE=true`.
+Phase 12 adds repeatability and fault-injection tests: event schema, synergy rules, registry lookup, six-agent start, cross-agent adaptation, three-scenario reset, missing API key, and LLM fallback. Keep `MOCK_INFERENCE_MODE=true`. UI polish is out of scope for this phase.
 
 ## Getting started
 

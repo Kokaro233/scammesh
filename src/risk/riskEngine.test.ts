@@ -5,7 +5,7 @@ import { createInitialSessionState } from "../runtime/sessionState"
 import { loadScenario } from "../scenarios/loadScenario"
 import type { Channel, ScamEvent } from "../shared/types"
 import { applyRiskToSession, assessRisk } from "./riskEngine"
-import { BASE_EVENT_WEIGHTS } from "./weights"
+import { BASE_EVENT_WEIGHTS, SYNERGY_RULES } from "./weights"
 
 function wait(ms: number) {
 	return new Promise((resolve) => {
@@ -77,6 +77,24 @@ describe("deterministic risk engine", () => {
 
 		const reasonPoints = combined.reasons.map((reason) => Number(/^([+-]\d+)/.exec(reason)?.[1] ?? 0))
 		expect(reasonPoints.reduce((sum, value) => sum + value, 0)).toBeGreaterThanOrEqual(combined.score)
+	})
+
+	it("keeps synergy labels as demo-rule edges, not probabilities", () => {
+		expect(SYNERGY_RULES.map((rule) => rule.label)).toEqual([
+			"link opened",
+			"OTP requested",
+			"same claimed bank",
+			"new beneficiary",
+			"identity mismatch",
+		])
+		expect(SYNERGY_RULES.every((rule) => !/probability/i.test(rule.reason))).toBe(true)
+
+		const linked = assessRisk([
+			event(EVENT_TYPES.COERCION_DETECTED, "call"),
+			event(EVENT_TYPES.SUSPICIOUS_LINK_DETECTED, "message"),
+		])
+		expect(linked.correlations.map((edge) => edge.label)).toContain("link opened")
+		expect(linked.level).not.toBe("CRITICAL")
 	})
 
 	it("does not take only the largest agent score", () => {
