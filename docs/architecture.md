@@ -1,3 +1,3 @@
 # Architecture
 
-Phase 6 adds Device Agent and Transaction Agent on the official Mozaik v4 runtime. Transaction starts in NORMAL, switches to HEIGHTENED after `remote_control_detected`, then PRIORITY after a beneficiary identity mismatch, and re-checks the same transfer. It only writes a prototype pause recommendation. No payment is executed or blocked.
+Phase 7 adds a deterministic risk engine. Each semantic event has a base weight; cross-channel synergies and a 4+ channel bonus raise the score. Every change is recorded in a risk snapshot with reasons. Correlation edges link call↔message, message↔browser, browser↔identity, and device↔transaction. The engine is not an LLM judge. Scores are demo rules, not real probabilities.

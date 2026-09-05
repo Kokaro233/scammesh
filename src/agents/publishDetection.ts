@@ -1,5 +1,6 @@
 import { SemanticEvent } from "@mozaik-ai/core"
 import type { Detection } from "../inference/schema"
+import { applyRiskToSession } from "../risk/riskEngine"
 import { createScamEvent, EVENT_TYPES, type EventPayloadMap, type SemanticEventType } from "../runtime/events"
 import type { ScamSessionApi } from "../runtime/scamSessionApi"
 import type { AgentId, Channel, EntityKind, ScamEntity, Severity } from "../shared/types"
@@ -172,4 +173,6 @@ export function publishDetection(
 	if (detection.type === EVENT_TYPES.OFFICIAL_IDENTITY_MISMATCH && "kind" in payload) {
 		state.identityMismatches.push(payload)
 	}
+
+	applyRiskToSession(state.session, eventId)
 }

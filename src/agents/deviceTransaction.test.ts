@@ -101,12 +101,19 @@ describe("Device Agent and Transaction Agent", () => {
 			true,
 		)
 		expect(state.identityMismatches.some((item) => item.kind === "beneficiary")).toBe(true)
-		expect(state.session.recommendedActions[0]).toMatchObject({
-			title: "Prototype recommendation: STOP TRANSFER",
-		})
+		expect(
+			state.session.recommendedActions.some(
+				(action) =>
+					action.title === "Prototype recommendation: STOP TRANSFER" || action.title === "Do not transfer",
+			),
+		).toBe(true)
+		expect(
+			state.session.recommendedActions.some((action) => action.title === "Verify through official channel"),
+		).toBe(true)
 		expect(JSON.stringify(state.session.recommendedActions)).not.toContain("blocked successfully")
-		expect(state.session.overallRisk).toBe(0)
-		expect(state.session.riskLevel).toBe("LOW")
+		expect(state.session.riskLevel).toBe("CRITICAL")
+		expect(state.session.overallRisk).toBeGreaterThanOrEqual(75)
+		expect(state.session.riskSnapshots.at(-1)?.reasons.some((reason) => reason.includes("synergy"))).toBe(true)
 
 		const devicePayloads = state.analyzeLog
 			.filter((entry) => entry.agentId === "device")

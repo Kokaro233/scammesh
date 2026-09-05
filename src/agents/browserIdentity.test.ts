@@ -76,8 +76,11 @@ describe("Browser Agent and Identity Agent", () => {
 		)
 		expect(state.session.events.some((event) => event.type === EVENT_TYPES.OFFICIAL_IDENTITY_MISMATCH)).toBe(true)
 		expect(state.identityMismatches.some((item) => item.kind === "domain")).toBe(true)
-		expect(state.session.overallRisk).toBe(0)
-		expect(state.session.riskLevel).toBe("LOW")
+		expect(state.session.overallRisk).toBeGreaterThan(0)
+		expect(state.session.riskSnapshots.at(-1)?.reasons.length).toBeGreaterThan(0)
+		expect(
+			state.session.correlations.some((edge) => edge.fromChannel === "message" && edge.toChannel === "browser"),
+		).toBe(true)
 
 		const domain = Object.values(state.session.entities).find(
 			(entity) => entity.kind === "domain" && entity.value.includes("secure-bank-verify"),
