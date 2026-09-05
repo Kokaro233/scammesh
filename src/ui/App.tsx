@@ -2,12 +2,16 @@ import { useEffect, useState } from "react"
 import type { SimulationStateView } from "../shared/simulationView"
 import type { ScenarioId } from "../shared/types"
 import type { UiEvent } from "../shared/uiEvents"
+import { ActionPage } from "./ActionPage"
 import { fetchScenarios, fetchSimulationState, resetSimulation, startSimulation, type ScenarioOption } from "./api"
 import { DefenseRoom } from "./DefenseRoom"
+import { EvidencePage } from "./EvidencePage"
 import { HomeScreen } from "./HomeScreen"
 
+type AppView = "home" | "room" | "evidence" | "action"
+
 export function App() {
-	const [view, setView] = useState<"home" | "room">("home")
+	const [view, setView] = useState<AppView>("home")
 	const [scenarios, setScenarios] = useState<ScenarioOption[]>([])
 	const [selected, setSelected] = useState<ScenarioId>("bank-impersonation")
 	const [state, setState] = useState<SimulationStateView | null>(null)
@@ -25,7 +29,7 @@ export function App() {
 	}, [])
 
 	useEffect(() => {
-		if (view !== "room") {
+		if (view === "home") {
 			return
 		}
 
@@ -64,8 +68,32 @@ export function App() {
 		setView("home")
 	}
 
+	async function onRestart() {
+		await resetSimulation()
+		setEvents([])
+		const next = await startSimulation(selected, 2)
+		setState(next)
+		setView("room")
+	}
+
+	if (state && view === "evidence") {
+		return <EvidencePage state={state} onBack={() => setView("room")} onAction={() => setView("action")} />
+	}
+
+	if (state && view === "action") {
+		return <ActionPage state={state} onBack={() => setView("room")} onRestart={() => void onRestart()} />
+	}
+
 	if (view === "room" && state) {
-		return <DefenseRoom state={state} events={events} onReset={() => void onReset()} />
+		return (
+			<DefenseRoom
+				state={state}
+				events={events}
+				onReset={() => void onReset()}
+				onEvidence={() => setView("evidence")}
+				onAction={() => setView("action")}
+			/>
+		)
 	}
 
 	return (

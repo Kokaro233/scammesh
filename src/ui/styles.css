@@ -132,6 +132,47 @@ select {
 	gap: 16px;
 }
 
+.top-actions {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.page {
+	min-height: 100vh;
+	display: grid;
+	align-content: start;
+	gap: 12px;
+	padding: 16px;
+}
+
+.page h1 {
+	margin: 0;
+	font-size: 1.4rem;
+}
+
+.panel {
+	background: var(--bg-elevated);
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	padding: 14px 16px;
+}
+
+.panel h3 {
+	margin: 0 0 8px;
+}
+
+.panel p,
+.panel li {
+	color: var(--muted);
+	line-height: 1.45;
+}
+
+.disclaimer {
+	margin-top: 12px;
+	font-size: 0.85rem;
+}
+
 .score {
 	display: flex;
 	gap: 16px;
