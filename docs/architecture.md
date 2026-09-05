@@ -1,3 +1,3 @@
 # Architecture
 
-Phase 5 adds Browser Agent and Identity Agent on the official Mozaik v4 runtime. After Message emits `suspicious_link_detected`, Browser switches to PRIORITY and re-checks the same page. Identity compares claimed domains against the local trusted registry mock and writes mismatches to shared session state. Identity is not a final judge. Device and Transaction are not implemented yet.
+Phase 6 adds Device Agent and Transaction Agent on the official Mozaik v4 runtime. Transaction starts in NORMAL, switches to HEIGHTENED after `remote_control_detected`, then PRIORITY after a beneficiary identity mismatch, and re-checks the same transfer. It only writes a prototype pause recommendation. No payment is executed or blocked.

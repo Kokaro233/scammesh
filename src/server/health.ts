@@ -2,7 +2,7 @@ export function healthPayload() {
 	return {
 		ok: true,
 		service: "scammesh",
-		phase: 5,
+		phase: 6,
 		mockInferenceMode: process.env.MOCK_INFERENCE_MODE === "true",
 	}
 }

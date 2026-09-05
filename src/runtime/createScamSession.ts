@@ -1,11 +1,20 @@
 import { createHuman, defineRuntime, SemanticEvent, SituationSpecification } from "@mozaik-ai/core"
 import { createBrowserAgent } from "../agents/browserAgent"
 import { createCallAgent } from "../agents/callAgent"
+import { createDeviceAgent } from "../agents/deviceAgent"
 import { FEED_EVENTS } from "../agents/feedEvents"
 import { createIdentityAgent } from "../agents/identityAgent"
 import { createMessageAgent } from "../agents/messageAgent"
+import { createTransactionAgent } from "../agents/transactionAgent"
 import { createInferenceProvider } from "../inference/createInference"
-import type { BrowserPage, CallUtterance, IdentityLookup, InboundMessage } from "../shared/types"
+import type {
+	BrowserPage,
+	CallUtterance,
+	DeviceTelemetry,
+	IdentityLookup,
+	InboundMessage,
+	TransactionIntent,
+} from "../shared/types"
 import { DelayedMockInferenceRunner } from "./dummy/runner"
 import { ScamRuntimeState } from "./scamSessionState"
 
@@ -21,6 +30,8 @@ export function createScamSession() {
 				"scam-message": 200,
 				"scam-browser": 100,
 				"scam-identity": 160,
+				"scam-device": 70,
+				"scam-transaction": 180,
 			}),
 		},
 	})
@@ -57,6 +68,8 @@ export function createScamSession() {
 	const messageAgent = createMessageAgent(api)
 	const browserAgent = createBrowserAgent(api)
 	const identityAgent = createIdentityAgent(api)
+	const deviceAgent = createDeviceAgent(api)
+	const transactionAgent = createTransactionAgent(api)
 
 	join(starter)
 	join(feeder)
@@ -65,6 +78,8 @@ export function createScamSession() {
 	join(messageAgent)
 	join(browserAgent)
 	join(identityAgent)
+	join(deviceAgent)
+	join(transactionAgent)
 
 	return {
 		resolveRuntime,
@@ -81,6 +96,8 @@ export function createScamSession() {
 		messageAgent,
 		browserAgent,
 		identityAgent,
+		deviceAgent,
+		transactionAgent,
 		start() {
 			sendMessage("start concurrent scam agents", starter.getId())
 		},
@@ -95,6 +112,12 @@ export function createScamSession() {
 		},
 		injectIdentity(lookup: IdentityLookup) {
 			sendEvent(SemanticEvent.create(FEED_EVENTS.IDENTITY, feeder.getId(), lookup), feeder.getId())
+		},
+		injectDevice(telemetry: DeviceTelemetry) {
+			sendEvent(SemanticEvent.create(FEED_EVENTS.DEVICE, feeder.getId(), telemetry), feeder.getId())
+		},
+		injectTransaction(intent: TransactionIntent) {
+			sendEvent(SemanticEvent.create(FEED_EVENTS.TRANSACTION, feeder.getId(), intent), feeder.getId())
 		},
 	}
 }

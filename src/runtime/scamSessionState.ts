@@ -5,8 +5,10 @@ import type {
 	BrowserPage,
 	CallUtterance,
 	Channel,
+	DeviceTelemetry,
 	IdentityLookup,
 	InboundMessage,
+	TransactionIntent,
 	TrustedRegistry,
 } from "../shared/types"
 import type { EventPayloadMap } from "./events"
@@ -23,7 +25,7 @@ export interface AnalyzeLogEntry {
 	payload: unknown
 }
 
-export type ActiveLoopAgent = "call" | "message" | "browser" | "identity"
+export type ActiveLoopAgent = "call" | "message" | "browser" | "identity" | "device" | "transaction"
 
 export class ScamRuntimeState extends RuntimeState {
 	session = createInitialSessionState()
@@ -31,6 +33,8 @@ export class ScamRuntimeState extends RuntimeState {
 	messageInbox: InboundMessage[] = []
 	browserPages: BrowserPage[] = []
 	identityLookups: IdentityLookup[] = []
+	deviceTelemetry: DeviceTelemetry[] = []
+	transactionIntents: TransactionIntent[] = []
 	identityMismatches: Array<EventPayloadMap["official_identity_mismatch"]> = []
 	analyzedIdentityKeys = new Set<string>()
 	registry: TrustedRegistry = APEX_TRUSTED_REGISTRY
@@ -41,5 +45,7 @@ export class ScamRuntimeState extends RuntimeState {
 		message: {},
 		browser: {},
 		identity: {},
+		device: {},
+		transaction: {},
 	}
 }

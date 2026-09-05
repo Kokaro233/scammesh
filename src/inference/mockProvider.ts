@@ -159,33 +159,33 @@ function analyzeDevice(payload: DeviceTelemetry): Detection[] {
 	return []
 }
 
-function analyzeTransaction(payload: TransactionIntent): Detection[] {
+function analyzeTransaction(payload: TransactionIntent, context: InferenceContext): Detection[] {
 	const detections: Detection[] = []
 	if (payload.isNewBeneficiary) {
 		detections.push({
 			type: EVENT_TYPES.NEW_BENEFICIARY_DETECTED,
-			severity: "medium",
+			severity: context.mode === "PRIORITY" ? "high" : "medium",
 			confidence: 0.89,
 			summary: "Transfer targets a new beneficiary.",
-			entityRefs: [payload.beneficiaryAccount],
+			entityRefs: [payload.beneficiaryAccount, payload.beneficiaryName],
 		})
 	}
-	if (payload.amount >= 5_000) {
+	if ((context.mode === "HEIGHTENED" || context.mode === "PRIORITY") && payload.amount >= 5_000) {
 		detections.push({
 			type: EVENT_TYPES.HIGH_VALUE_TRANSFER_DETECTED,
-			severity: "high",
+			severity: context.mode === "PRIORITY" ? "critical" : "high",
 			confidence: 0.87,
 			summary: `High-value transfer of ${payload.currency} ${payload.amount}.`,
-			entityRefs: [payload.beneficiaryAccount],
+			entityRefs: [payload.beneficiaryAccount, String(payload.amount)],
 		})
 	}
-	if (!payload.reversible && (payload.isNewBeneficiary || payload.amount >= 1_000)) {
+	if (context.mode === "PRIORITY" && !payload.reversible && (payload.isNewBeneficiary || payload.amount >= 1_000)) {
 		detections.push({
 			type: EVENT_TYPES.IRREVERSIBLE_PAYMENT_DETECTED,
-			severity: "high",
+			severity: "critical",
 			confidence: 0.85,
 			summary: `${payload.paymentRail} payment is not reversible.`,
-			entityRefs: [payload.paymentRail],
+			entityRefs: [payload.paymentRail, String(payload.amount)],
 		})
 	}
 	return detections
@@ -264,7 +264,7 @@ export class MockInferenceProvider implements InferenceProvider {
 		} else if (input.channel === "device" && "kind" in input.payload) {
 			detections = analyzeDevice(input.payload as DeviceTelemetry)
 		} else if (input.channel === "transaction" && "beneficiaryAccount" in input.payload) {
-			detections = analyzeTransaction(input.payload as TransactionIntent)
+			detections = analyzeTransaction(input.payload as TransactionIntent, context)
 		} else if (input.channel === "identity" && "value" in input.payload) {
 			detections = analyzeIdentity(input.payload as IdentityLookup, context)
 		}

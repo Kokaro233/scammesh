@@ -66,6 +66,26 @@ function payloadFor(detection: Detection): EventPayloadMap[SemanticEventType] {
 				contact: refs[0] ?? "unknown",
 				contactKind: refs[1] === "domain" ? "domain" : "phone",
 			}
+		case EVENT_TYPES.REMOTE_CONTROL_DETECTED:
+		case EVENT_TYPES.SCREEN_SHARE_ENABLED:
+			return { appName: refs[0] }
+		case EVENT_TYPES.NEW_BENEFICIARY_DETECTED:
+			return {
+				beneficiaryName: refs.find((ref) => !/^\d+$/.test(ref)) ?? "unknown",
+				beneficiaryAccount: refs.find((ref) => /^\d+$/.test(ref)) ?? refs[0] ?? "unknown",
+				amount: 0,
+				currency: "MYR",
+			}
+		case EVENT_TYPES.HIGH_VALUE_TRANSFER_DETECTED:
+			return {
+				amount: Number(refs.find((ref) => /^\d+$/.test(ref) && Number(ref) >= 1_000)) || 0,
+				currency: "MYR",
+			}
+		case EVENT_TYPES.IRREVERSIBLE_PAYMENT_DETECTED:
+			return {
+				paymentRail: refs.find((ref) => !/^\d+$/.test(ref)) ?? refs[0] ?? "unknown",
+				amount: Number(refs.find((ref) => /^\d+$/.test(ref))) || 0,
+			}
 		default:
 			return { excerpt: detection.summary }
 	}
@@ -80,6 +100,9 @@ function entityKindFor(value: string): EntityKind | undefined {
 	}
 	if (value.startsWith("+")) {
 		return "phone"
+	}
+	if (/^\d{6,}$/.test(value)) {
+		return "beneficiary"
 	}
 	if (/bank/i.test(value)) {
 		return "bank"
@@ -119,10 +142,11 @@ export function publishDetection(
 		channel: Channel
 		detection: Detection
 		eventId: string
+		eventPayload?: EventPayloadMap[SemanticEventType]
 	},
 ) {
 	const { participantId, agentId, channel, detection, eventId } = input
-	const payload = payloadFor(detection)
+	const payload = input.eventPayload ?? payloadFor(detection)
 	const state = api.resolveRuntime().state
 
 	api.sendEvent(SemanticEvent.create(detection.type, participantId, payload), participantId)

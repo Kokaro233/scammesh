@@ -3,4 +3,6 @@ export const FEED_EVENTS = {
 	MESSAGE: "feed.message",
 	BROWSER: "feed.browser",
 	IDENTITY: "feed.identity",
+	DEVICE: "feed.device",
+	TRANSACTION: "feed.transaction",
 } as const

@@ -4,7 +4,7 @@ Cross-channel scam defense powered by concurrent agents.
 
 This repository is a **Hackathon prototype**. It performs **no real financial actions**.
 
-Phase 5 runs Call, Message, Browser, and Identity concurrently on Mozaik. Keep `MOCK_INFERENCE_MODE=true`. Device and Transaction are not implemented yet.
+Phase 6 runs all six agents concurrently on Mozaik. Keep `MOCK_INFERENCE_MODE=true`. Transaction only recommends pausing a transfer; it never blocks or sends a payment.
 
 ## Getting started
 
