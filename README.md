@@ -4,7 +4,7 @@ Cross-channel scam defense powered by concurrent agents.
 
 This repository is a **Hackathon prototype**. It performs **no real financial actions**.
 
-Phase 2 uses the official Mozaik v4 runtime from https://github.com/jigjoy-ai/mozaik. Dummy alpha/beta prove concurrent `runLoop`s. Business agents are not implemented yet.
+Phase 3 can run without an LLM key via `MOCK_INFERENCE_MODE=true`. Leave `LLM_*` empty. Business agents are not implemented yet.
 
 ## Getting started
 
