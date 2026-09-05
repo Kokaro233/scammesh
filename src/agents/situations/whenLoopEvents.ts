@@ -5,7 +5,7 @@ import {
 	SituationSpecification,
 } from "@mozaik-ai/core"
 import type { ScamSessionApi } from "../../runtime/scamSessionApi"
-import type { AgentId } from "../../shared/types"
+import type { ActiveLoopAgent } from "../../runtime/scamSessionState"
 
 export class WhenOwnInferenceStarts extends SituationSpecification {
 	isSatisfiedBy({ event, participant }: SituationContext): boolean {
@@ -19,7 +19,7 @@ export class WhenOwnModelAnswers extends SituationSpecification {
 	}
 }
 
-export function createLoopTraceHandlers(api: ScamSessionApi, agentId: "call" | "message"): SituationHandler[] {
+export function createLoopTraceHandlers(api: ScamSessionApi, agentId: ActiveLoopAgent): SituationHandler[] {
 	return [
 		{
 			specification: new WhenOwnInferenceStarts(),
@@ -34,7 +34,7 @@ export function createLoopTraceHandlers(api: ScamSessionApi, agentId: "call" | "
 			processor: {
 				apply() {
 					api.resolveRuntime().state.loops[agentId].endedAt = Date.now()
-					api.resolveRuntime().state.session.agentStatuses[agentId as AgentId] = "DONE"
+					api.resolveRuntime().state.session.agentStatuses[agentId] = "DONE"
 				},
 			} satisfies SituationProcessor,
 		},

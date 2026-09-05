@@ -25,7 +25,7 @@ export async function inspectCurrentMessages(api: ScamSessionApi, participantId:
 			agentId: "message",
 			channel: "message",
 			mode: state.session.agentModes.message,
-			registry: undefined,
+			registry: state.registry,
 		})
 
 		result.detections.forEach((detection, detectionIndex) => {

@@ -206,7 +206,9 @@ function analyzeIdentity(payload: IdentityLookup, context: InferenceContext): De
 				severity: "high",
 				confidence: 0.92,
 				summary: "Phone number is not in the trusted official registry.",
-				entityRefs: [payload.value],
+				entityRefs: [payload.value, payload.kind, payload.claimedOrganization].filter((item): item is string =>
+					Boolean(item),
+				),
 			},
 		]
 	}
@@ -218,7 +220,9 @@ function analyzeIdentity(payload: IdentityLookup, context: InferenceContext): De
 				severity: "high",
 				confidence: 0.95,
 				summary: "Domain is not an official bank domain.",
-				entityRefs: [payload.value],
+				entityRefs: [payload.value, payload.kind, payload.claimedOrganization].filter((item): item is string =>
+					Boolean(item),
+				),
 			},
 		]
 	}
@@ -230,7 +234,9 @@ function analyzeIdentity(payload: IdentityLookup, context: InferenceContext): De
 				severity: "high",
 				confidence: 0.9,
 				summary: "Beneficiary is not a known official payee.",
-				entityRefs: [payload.value],
+				entityRefs: [payload.value, payload.kind, payload.claimedOrganization].filter((item): item is string =>
+					Boolean(item),
+				),
 			},
 		]
 	}

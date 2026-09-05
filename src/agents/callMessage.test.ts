@@ -51,8 +51,9 @@ describe("Call Agent and Message Agent", () => {
 
 		const state = session.resolveRuntime().state
 		expect(loopsOverlap(state.loops.call, state.loops.message)).toBe(true)
-		expect(state.session.adaptations).toHaveLength(1)
-		expect(state.session.adaptations[0]).toMatchObject({
+		expect(
+			state.session.adaptations.find((item) => item.sourceAgent === "call" && item.targetAgent === "message"),
+		).toMatchObject({
 			sourceAgent: "call",
 			targetAgent: "message",
 			triggerEvent: EVENT_TYPES.COERCION_DETECTED,

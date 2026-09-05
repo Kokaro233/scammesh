@@ -1,5 +1,15 @@
 import { RuntimeState } from "@mozaik-ai/core"
-import type { AgentId, CallUtterance, Channel, InboundMessage } from "../shared/types"
+import { APEX_TRUSTED_REGISTRY } from "../scenarios/trustedRegistry"
+import type {
+	AgentId,
+	BrowserPage,
+	CallUtterance,
+	Channel,
+	IdentityLookup,
+	InboundMessage,
+	TrustedRegistry,
+} from "../shared/types"
+import type { EventPayloadMap } from "./events"
 import { createInitialSessionState } from "./sessionState"
 
 export interface ChannelLoopTrace {
@@ -13,14 +23,23 @@ export interface AnalyzeLogEntry {
 	payload: unknown
 }
 
+export type ActiveLoopAgent = "call" | "message" | "browser" | "identity"
+
 export class ScamRuntimeState extends RuntimeState {
 	session = createInitialSessionState()
 	callTranscript: CallUtterance[] = []
 	messageInbox: InboundMessage[] = []
+	browserPages: BrowserPage[] = []
+	identityLookups: IdentityLookup[] = []
+	identityMismatches: Array<EventPayloadMap["official_identity_mismatch"]> = []
+	analyzedIdentityKeys = new Set<string>()
+	registry: TrustedRegistry = APEX_TRUSTED_REGISTRY
 	publishedTypes: string[] = []
 	analyzeLog: AnalyzeLogEntry[] = []
-	loops: Record<"call" | "message", ChannelLoopTrace> = {
+	loops: Record<ActiveLoopAgent, ChannelLoopTrace> = {
 		call: {},
 		message: {},
+		browser: {},
+		identity: {},
 	}
 }
