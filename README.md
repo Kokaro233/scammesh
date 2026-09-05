@@ -4,7 +4,7 @@ Cross-channel scam defense powered by concurrent agents.
 
 This repository is a **Hackathon prototype**. It performs **no real financial actions**.
 
-Phase 9 is a one-page Live Defense Room: scenario launch, six agent cards, risk panel, timeline, and a graph stub. Keep `MOCK_INFERENCE_MODE=true`.
+Phase 10 draws the Live Scam Graph from real correlation rules. Nodes stay apart until edges appear; the finished chain highlights when a cross-channel pattern is detected. Keep `MOCK_INFERENCE_MODE=true`.
 
 ## Getting started
 

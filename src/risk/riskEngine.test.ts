@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest"
 import { createScamSession } from "../runtime/createScamSession"
 import { createScamEvent, EVENT_TYPES, type SemanticEventType } from "../runtime/events"
+import { createInitialSessionState } from "../runtime/sessionState"
 import { loadScenario } from "../scenarios/loadScenario"
 import type { Channel, ScamEvent } from "../shared/types"
-import { assessRisk } from "./riskEngine"
+import { applyRiskToSession, assessRisk } from "./riskEngine"
 import { BASE_EVENT_WEIGHTS } from "./weights"
 
 function wait(ms: number) {
@@ -136,5 +137,24 @@ describe("deterministic risk engine", () => {
 		await wait(450)
 
 		expect(session.resolveRuntime().state.session.riskLevel).not.toBe("CRITICAL")
+	})
+
+	it("records a cross-channel pattern only after a CRITICAL multi-channel fusion", () => {
+		const session = createInitialSessionState()
+		session.events = [
+			event(EVENT_TYPES.COERCION_DETECTED, "call"),
+			event(EVENT_TYPES.SUSPICIOUS_LINK_DETECTED, "message"),
+			event(EVENT_TYPES.CREDENTIAL_HARVESTING_DETECTED, "browser"),
+			event(EVENT_TYPES.REMOTE_CONTROL_DETECTED, "device"),
+			event(EVENT_TYPES.NEW_BENEFICIARY_DETECTED, "transaction"),
+			event(EVENT_TYPES.OFFICIAL_IDENTITY_MISMATCH, "identity"),
+		]
+		applyRiskToSession(session, "combo")
+		expect(session.events.some((item) => item.type === EVENT_TYPES.CROSS_CHANNEL_PATTERN_DETECTED)).toBe(true)
+
+		const lonely = createInitialSessionState()
+		lonely.events = [event(EVENT_TYPES.CREDENTIAL_HARVESTING_DETECTED, "browser")]
+		applyRiskToSession(lonely, "solo")
+		expect(lonely.events.some((item) => item.type === EVENT_TYPES.CROSS_CHANNEL_PATTERN_DETECTED)).toBe(false)
 	})
 })

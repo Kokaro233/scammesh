@@ -204,24 +204,60 @@ select {
 	letter-spacing: 0.04em;
 }
 
-.graph-nodes {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 8px;
+.graph {
+	min-width: 0;
 }
 
-.graph-node {
-	border: 1px dashed var(--line);
-	border-radius: 8px;
-	padding: 10px;
-	text-align: center;
-	color: var(--muted);
+.graph-hot {
+	border-color: var(--critical);
 }
 
-.graph-node.active {
-	border-style: solid;
-	border-color: var(--accent);
-	color: var(--text);
+.scam-svg {
+	width: 100%;
+	height: auto;
+	display: block;
+	pointer-events: none;
+}
+
+.scam-svg .node circle {
+	fill: var(--bg);
+	stroke: var(--line);
+	stroke-dasharray: 4 3;
+}
+
+.scam-svg .node text,
+.scam-svg .edge text {
+	fill: var(--muted);
+	font-size: 10px;
+	text-anchor: middle;
+}
+
+.scam-svg .node.active circle {
+	stroke: var(--accent);
+	stroke-dasharray: none;
+}
+
+.scam-svg .node.active text {
+	fill: var(--text);
+}
+
+.scam-svg .node.hot circle {
+	stroke: var(--critical);
+	fill: #2a1820;
+}
+
+.scam-svg .edge line {
+	stroke: var(--accent);
+	stroke-width: 2;
+}
+
+.scam-svg .edge.hot line {
+	stroke: var(--critical);
+	stroke-width: 3;
+}
+
+.scam-svg .edge text {
+	fill: var(--accent);
 }
 
 .timeline ol {

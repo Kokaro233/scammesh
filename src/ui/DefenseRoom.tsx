@@ -3,7 +3,7 @@ import type { UiEvent } from "../shared/uiEvents"
 import { AgentCard } from "./AgentCard"
 import { EventTimeline } from "./EventTimeline"
 import { RiskPanel } from "./RiskPanel"
-import { ScamGraphStub } from "./ScamGraphStub"
+import { LiveScamGraph } from "./LiveScamGraph"
 
 export function DefenseRoom({
 	state,
@@ -36,7 +36,7 @@ export function DefenseRoom({
 						<AgentCard key={agent.agentId} agent={agent} />
 					))}
 				</div>
-				<ScamGraphStub state={state} />
+				<LiveScamGraph state={state} />
 			</section>
 			<EventTimeline events={events} />
 		</main>

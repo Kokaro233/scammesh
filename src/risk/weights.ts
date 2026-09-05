@@ -43,7 +43,7 @@ export const SYNERGY_RULES: SynergyRule[] = [
 		reason: "+15 synergy: coercion + suspicious link",
 		fromChannel: "call",
 		toChannel: "message",
-		label: "call coercion to SMS link",
+		label: "link opened",
 	},
 	{
 		id: "link-otp-page",
@@ -52,7 +52,7 @@ export const SYNERGY_RULES: SynergyRule[] = [
 		reason: "+20 synergy: suspicious link + OTP page",
 		fromChannel: "message",
 		toChannel: "browser",
-		label: "SMS link to credential harvesting",
+		label: "OTP requested",
 	},
 	{
 		id: "browser-identity-domain",
@@ -61,7 +61,7 @@ export const SYNERGY_RULES: SynergyRule[] = [
 		reason: "",
 		fromChannel: "browser",
 		toChannel: "identity",
-		label: "clone page to identity mismatch",
+		label: "same claimed bank",
 	},
 	{
 		id: "remote-new-beneficiary",
@@ -70,7 +70,7 @@ export const SYNERGY_RULES: SynergyRule[] = [
 		reason: "+20 synergy: remote control + new beneficiary",
 		fromChannel: "device",
 		toChannel: "transaction",
-		label: "remote control to new beneficiary",
+		label: "new beneficiary",
 	},
 	{
 		id: "identity-irreversible-transfer",
@@ -83,7 +83,7 @@ export const SYNERGY_RULES: SynergyRule[] = [
 		reason: "+18 synergy: identity mismatch + high-value irreversible transfer",
 		fromChannel: "identity",
 		toChannel: "transaction",
-		label: "identity mismatch to payment",
+		label: "identity mismatch",
 	},
 ]
 

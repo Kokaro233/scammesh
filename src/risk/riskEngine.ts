@@ -1,4 +1,4 @@
-import { EVENT_CATEGORIES, EVENT_TYPES, type EventPayloadMap } from "../runtime/events"
+import { createScamEvent, EVENT_CATEGORIES, EVENT_TYPES, type EventPayloadMap } from "../runtime/events"
 import type {
 	Channel,
 	CorrelationEdge,
@@ -156,5 +156,32 @@ export function applyRiskToSession(session: SessionState, triggerEventId?: strin
 		triggerEventId,
 	}
 	session.riskSnapshots.push(snapshot)
+	recordCrossChannelPattern(session, assessment)
 	return assessment
+}
+
+function recordCrossChannelPattern(session: SessionState, assessment: RiskAssessment) {
+	if (assessment.level !== "CRITICAL" || assessment.channels.length < CHANNEL_COUNT_THRESHOLD) {
+		return
+	}
+	if (session.events.some((event) => event.type === EVENT_TYPES.CROSS_CHANNEL_PATTERN_DETECTED)) {
+		return
+	}
+
+	const last = session.events.at(-1)
+	session.events.push(
+		createScamEvent({
+			eventId: "pattern-cross-channel",
+			type: EVENT_TYPES.CROSS_CHANNEL_PATTERN_DETECTED,
+			producerId: last?.producerId ?? "identity",
+			occurredAt: Date.now(),
+			severity: "critical",
+			confidence: 1,
+			channel: last?.channel ?? "identity",
+			entityRefs: assessment.channels,
+			summary: "Cross-channel scam pattern detected from combined semantic events.",
+			correlationKey: "scam_case_001",
+			payload: { correlationKey: "scam_case_001", channels: assessment.channels },
+		}),
+	)
 }
