@@ -4,7 +4,7 @@ Cross-channel scam defense powered by concurrent agents.
 
 This repository is a **Hackathon prototype**. It performs **no real financial actions**.
 
-Phase 8 exposes a live simulation API: `POST /api/simulation/start`, `POST /reset`, `GET /state`, and SSE `GET /api/events`. The browser never owns the Mozaik runtime. Keep `MOCK_INFERENCE_MODE=true`.
+Phase 9 is a one-page Live Defense Room: scenario launch, six agent cards, risk panel, timeline, and a graph stub. Keep `MOCK_INFERENCE_MODE=true`.
 
 ## Getting started
 

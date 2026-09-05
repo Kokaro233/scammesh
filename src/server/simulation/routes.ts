@@ -1,5 +1,6 @@
 import type { Express, Response } from "express"
-import { SCENARIO_IDS, type ScenarioId } from "../../shared/types"
+import { loadAllScenarios } from "../../scenarios/loadScenario"
+import type { ScenarioId } from "../../shared/types"
 import type { SimulationController } from "./controller"
 
 function writeSse(res: Response, event: unknown) {
@@ -32,7 +33,13 @@ export function registerSimulationRoutes(app: Express, controller: SimulationCon
 	app.get("/api/simulation/state", state)
 	app.get("/state", state)
 	app.get("/api/scenarios", (_req, res) => {
-		res.json({ scenarios: [...SCENARIO_IDS] })
+		res.json({
+			scenarios: loadAllScenarios().map((scenario) => ({
+				id: scenario.id,
+				title: scenario.title,
+				summary: scenario.summary,
+			})),
+		})
 	})
 	app.get("/api/events", (req, res) => {
 		res.setHeader("Content-Type", "text/event-stream")

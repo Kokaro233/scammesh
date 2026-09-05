@@ -1,0 +1,262 @@
+:root {
+	color-scheme: dark;
+	--bg: #12151c;
+	--bg-elevated: #1a1f2a;
+	--line: #2b3344;
+	--text: #edf1f7;
+	--muted: #9aa6b8;
+	--accent: #7aa2ff;
+	--watch: #e3b341;
+	--high: #e07a3d;
+	--critical: #e25b6a;
+	--ok: #3fbf8f;
+	font-family: "Segoe UI", sans-serif;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+	margin: 0;
+	min-height: 100%;
+	background: var(--bg);
+	color: var(--text);
+}
+
+button,
+select {
+	font: inherit;
+}
+
+.home {
+	min-height: 100vh;
+	display: grid;
+	place-items: center;
+	padding: 32px 20px;
+}
+
+.home-card {
+	width: min(720px, 100%);
+	background: var(--bg-elevated);
+	border: 1px solid var(--line);
+	border-radius: 16px;
+	padding: 32px;
+	display: grid;
+	gap: 18px;
+}
+
+.home h1 {
+	margin: 0;
+	font-size: 2rem;
+}
+
+.home .tagline {
+	margin: 0;
+	color: var(--accent);
+	font-size: 1.15rem;
+}
+
+.home p {
+	margin: 0;
+	color: var(--muted);
+	line-height: 1.5;
+}
+
+.scenario-list {
+	display: grid;
+	gap: 10px;
+}
+
+.scenario-list label {
+	display: grid;
+	gap: 4px;
+	padding: 12px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+.scenario-list label.active {
+	border-color: var(--accent);
+}
+
+.scenario-list strong {
+	display: block;
+}
+
+.primary {
+	border: 0;
+	border-radius: 10px;
+	padding: 12px 16px;
+	background: var(--accent);
+	color: #101318;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.ghost {
+	border: 1px solid var(--line);
+	background: transparent;
+	color: var(--text);
+	border-radius: 8px;
+	padding: 8px 12px;
+	cursor: pointer;
+}
+
+.room {
+	min-height: 100vh;
+	display: grid;
+	grid-template-rows: auto auto 1fr auto;
+	gap: 12px;
+	padding: 16px;
+}
+
+.topbar,
+.risk-panel,
+.agent-card,
+.graph,
+.timeline {
+	background: var(--bg-elevated);
+	border: 1px solid var(--line);
+	border-radius: 12px;
+}
+
+.topbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 14px 16px;
+	gap: 16px;
+}
+
+.score {
+	display: flex;
+	gap: 16px;
+	align-items: baseline;
+}
+
+.score strong {
+	font-size: 2rem;
+}
+
+.level-LOW {
+	color: var(--ok);
+}
+.level-WATCH {
+	color: var(--watch);
+}
+.level-HIGH {
+	color: var(--high);
+}
+.level-CRITICAL {
+	color: var(--critical);
+}
+
+.workspace {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	gap: 12px;
+	min-height: 0;
+}
+
+.agent-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 10px;
+}
+
+.agent-card,
+.graph,
+.risk-panel,
+.timeline {
+	padding: 12px;
+}
+
+.agent-card h3,
+.graph h3,
+.risk-panel h3,
+.timeline h3 {
+	margin: 0 0 8px;
+	font-size: 0.95rem;
+}
+
+.agent-card.running {
+	border-color: var(--accent);
+}
+
+.agent-card p {
+	margin: 0 0 6px;
+	color: var(--muted);
+	font-size: 0.88rem;
+	line-height: 1.4;
+}
+
+.meta {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	font-size: 0.78rem;
+	color: var(--muted);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.graph-nodes {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 8px;
+}
+
+.graph-node {
+	border: 1px dashed var(--line);
+	border-radius: 8px;
+	padding: 10px;
+	text-align: center;
+	color: var(--muted);
+}
+
+.graph-node.active {
+	border-style: solid;
+	border-color: var(--accent);
+	color: var(--text);
+}
+
+.timeline ol {
+	margin: 0;
+	padding-left: 18px;
+	max-height: 220px;
+	overflow: auto;
+}
+
+.timeline li {
+	margin-bottom: 6px;
+	color: var(--muted);
+	font-size: 0.88rem;
+}
+
+.timeline .kind {
+	color: var(--accent);
+	text-transform: uppercase;
+	font-size: 0.72rem;
+	margin-right: 8px;
+}
+
+.reasons {
+	margin: 0;
+	padding-left: 18px;
+	color: var(--muted);
+}
+
+.error {
+	color: var(--critical);
+}
+
+@media (max-width: 960px) {
+	.workspace,
+	.agent-grid {
+		grid-template-columns: 1fr;
+	}
+}
