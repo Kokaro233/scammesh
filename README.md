@@ -4,7 +4,7 @@ Cross-channel scam defense powered by concurrent agents.
 
 This repository is a **Hackathon prototype**. It performs **no real financial actions**.
 
-Phase 0 is an empty TypeScript baseline. Concurrent Mozaik agents are not implemented yet.
+Phase 1 locked shared types, event schema, and three mock scenarios. Concurrent Mozaik agents are not implemented yet.
 
 ## Getting started
 

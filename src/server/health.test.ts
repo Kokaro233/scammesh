@@ -17,7 +17,7 @@ describe("healthPayload", () => {
 		expect(healthPayload()).toEqual({
 			ok: true,
 			service: "scammesh",
-			phase: 0,
+			phase: 1,
 			mockInferenceMode: true,
 		})
 	})

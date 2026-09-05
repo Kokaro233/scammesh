@@ -1,3 +1,3 @@
 # Architecture
 
-Phase 0 skeleton. Document the Mozaik runtime, six agents, and risk fusion here as they are implemented.
+Phase 1 locked the shared types, semantic event schema, resettable session state, and three mock scenario feeds. Mozaik participants, inference, and risk fusion are not implemented yet.
