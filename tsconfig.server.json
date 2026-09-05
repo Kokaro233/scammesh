@@ -8,7 +8,7 @@
 		"skipLibCheck": true,
 		"noEmit": false,
 		"outDir": "dist/server",
-		"rootDir": "src/server",
+		"rootDir": "src",
 		"isolatedModules": true,
 		"verbatimModuleSyntax": true,
 		"noUnusedLocals": true,
@@ -16,6 +16,14 @@
 		"noFallthroughCasesInSwitch": true,
 		"types": ["node"]
 	},
-	"include": ["src/server/**/*.ts"],
-	"exclude": ["src/server/**/*.test.ts"]
+	"include": [
+		"src/server/**/*.ts",
+		"src/runtime/**/*.ts",
+		"src/agents/**/*.ts",
+		"src/inference/**/*.ts",
+		"src/risk/**/*.ts",
+		"src/scenarios/**/*.ts",
+		"src/shared/**/*.ts"
+	],
+	"exclude": ["src/**/*.test.ts", "src/ui/**"]
 }

@@ -4,7 +4,7 @@ Cross-channel scam defense powered by concurrent agents.
 
 This repository is a **Hackathon prototype**. It performs **no real financial actions**.
 
-Phase 7 fuses the six agents' semantic events with a deterministic risk engine. Scores are demo rules, not probabilities. Keep `MOCK_INFERENCE_MODE=true`.
+Phase 8 exposes a live simulation API: `POST /api/simulation/start`, `POST /reset`, `GET /state`, and SSE `GET /api/events`. The browser never owns the Mozaik runtime. Keep `MOCK_INFERENCE_MODE=true`.
 
 ## Getting started
 

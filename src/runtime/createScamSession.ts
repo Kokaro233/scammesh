@@ -119,5 +119,25 @@ export function createScamSession() {
 		injectTransaction(intent: TransactionIntent) {
 			sendEvent(SemanticEvent.create(FEED_EVENTS.TRANSACTION, feeder.getId(), intent), feeder.getId())
 		},
+		dispose() {
+			const participants = [
+				starter,
+				feeder,
+				observer,
+				callAgent,
+				messageAgent,
+				browserAgent,
+				identityAgent,
+				deviceAgent,
+				transactionAgent,
+			]
+			for (const participant of participants) {
+				try {
+					leave(participant)
+				} catch {
+					// Official leave is best-effort; a replaced session must not throw.
+				}
+			}
+		},
 	}
 }
