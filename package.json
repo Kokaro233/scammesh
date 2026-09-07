@@ -12,6 +12,7 @@
 		"dev:server": "tsx watch src/server/index.ts",
 		"dev:ui": "vite",
 		"build": "npm run typecheck && vite build && tsc -p tsconfig.server.json",
+		"build:docker": "vite build",
 		"start": "tsx src/server/index.ts",
 		"typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.server.json",
 		"test": "vitest run",
