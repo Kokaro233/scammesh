@@ -12,11 +12,12 @@ export function DemoProcess({
 }) {
 	const { state } = useScamStore()
 	const beats = demoBeats(state)
-	const idle = state.demoStatus === "idle" && state.signals.length === 0
-	const running = state.demoStatus === "running"
+	const busy = state.demoStatus === "running" || state.demoStatus === "paused"
+	const idleDesk = state.demoStatus === "idle" && state.signals.length === 0
+	const canStart = !busy
 
 	return (
-		<section className={`demo-process${running ? " is-live" : ""}${compact ? " is-compact" : ""}`} aria-label="Demo process">
+		<section className={`demo-process${busy && state.demoStatus === "running" ? " is-live" : ""}${compact ? " is-compact" : ""}`} aria-label="Demo process">
 			{compact ? (
 				<p className="demo-process-now">{demoCaption(state)}</p>
 			) : (
@@ -27,16 +28,16 @@ export function DemoProcess({
 			)}
 			<ol className="demo-beats">
 				{beats.map((beat, index) => (
-					<li key={beat.id} className={beat.done ? "is-done" : beat.current && !idle ? "is-now" : ""}>
+					<li key={beat.id} className={beat.done ? "is-done" : beat.current && !idleDesk ? "is-now" : ""}>
 						{index > 0 ? <i aria-hidden="true" /> : null}
 						<span className="mono">{beat.no}</span>
 						{beat.label}
 					</li>
 				))}
 			</ol>
-			{showStart && onStart && idle ? (
+			{showStart && onStart && canStart ? (
 				<button className="btn-danger demo-start-btn" type="button" onClick={onStart}>
-					Start demo
+					{idleDesk ? "Start demo" : "Restart demo"}
 				</button>
 			) : null}
 		</section>

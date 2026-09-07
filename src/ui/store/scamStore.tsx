@@ -41,6 +41,7 @@ export function useLiveSession(): void {
 
 	useEffect(() => {
 		let closed = false
+		let booted = false
 
 		const hydrate = async () => {
 			if (closed || sessionHydrateLocked()) {
@@ -48,9 +49,21 @@ export function useLiveSession(): void {
 			}
 			try {
 				const view = await fetchSimulationState()
-				if (!closed && !sessionHydrateLocked()) {
-					dispatch({ type: "HYDRATE", view })
+				if (closed || sessionHydrateLocked()) {
+					return
 				}
+				// A finished session from a previous visit hides Start demo and looks stuck.
+				// Clear it once on first load so refresh can restart cleanly.
+				if (!booted && view.status === "finished") {
+					booted = true
+					const cleared = await withSessionLock(() => resetSimulation())
+					if (!closed && !sessionHydrateLocked()) {
+						dispatch({ type: "HYDRATE", view: cleared })
+					}
+					return
+				}
+				booted = true
+				dispatch({ type: "HYDRATE", view })
 			} catch {
 				// Keep the last good frame if the server is briefly unreachable.
 			}
@@ -87,13 +100,18 @@ export function useDemoSession() {
 				if (overrides.speed) {
 					dispatch({ type: "SET_DEMO_SPEED", speed: overrides.speed })
 				}
-				dispatch({ type: "DEMO_START" })
+				// Lock before DEMO_START so the 500ms poll cannot hydrate an idle
+				// server frame and wipe local "running" (looks like a fake Run).
 				try {
-					const view = await withSessionLock(() =>
-						startSimulation(scenarioId, feedSpeed(speed), { identityDelay: state.simulateIdentityDelay }),
-					)
+					const view = await withSessionLock(async () => {
+						dispatch({ type: "DEMO_START" })
+						return startSimulation(scenarioId, feedSpeed(speed), {
+							identityDelay: state.simulateIdentityDelay,
+						})
+					})
 					dispatch({ type: "HYDRATE", view })
-				} catch {
+				} catch (error) {
+					console.error("simulation start failed", error)
 					dispatch({ type: "DEMO_RESET" })
 				}
 			},
@@ -101,11 +119,14 @@ export function useDemoSession() {
 				if (state.demoStatus !== "running") {
 					return
 				}
-				dispatch({ type: "DEMO_PAUSE" })
 				try {
-					const view = await withSessionLock(() => pauseSimulation())
+					const view = await withSessionLock(async () => {
+						dispatch({ type: "DEMO_PAUSE" })
+						return pauseSimulation()
+					})
 					dispatch({ type: "HYDRATE", view })
-				} catch {
+				} catch (error) {
+					console.error("simulation pause failed", error)
 					dispatch({ type: "DEMO_RESUME" })
 				}
 			},
@@ -113,30 +134,39 @@ export function useDemoSession() {
 				if (state.demoStatus !== "paused") {
 					return
 				}
-				dispatch({ type: "DEMO_RESUME" })
 				try {
-					const view = await withSessionLock(() => resumeSimulation())
+					const view = await withSessionLock(async () => {
+						dispatch({ type: "DEMO_RESUME" })
+						return resumeSimulation()
+					})
 					dispatch({ type: "HYDRATE", view })
-				} catch {
+				} catch (error) {
+					console.error("simulation resume failed", error)
 					dispatch({ type: "DEMO_PAUSE" })
 				}
 			},
 			async reset() {
-				dispatch({ type: "DEMO_RESET" })
 				try {
-					const view = await withSessionLock(() => resetSimulation())
+					const view = await withSessionLock(async () => {
+						dispatch({ type: "DEMO_RESET" })
+						return resetSimulation()
+					})
 					dispatch({ type: "HYDRATE", view })
-				} catch {
-					// Local reset still stands.
+				} catch (error) {
+					console.error("simulation reset failed", error)
+					dispatch({ type: "DEMO_RESET" })
 				}
 			},
 			async changeScenario(scenarioId: DemoScenarioId) {
-				dispatch({ type: "SET_SCENARIO", scenarioId })
 				try {
-					const view = await withSessionLock(() => resetSimulation())
+					const view = await withSessionLock(async () => {
+						dispatch({ type: "SET_SCENARIO", scenarioId })
+						return resetSimulation()
+					})
 					dispatch({ type: "HYDRATE", view })
-				} catch {
-					// Local scenario change still stands.
+				} catch (error) {
+					console.error("scenario change failed", error)
+					dispatch({ type: "SET_SCENARIO", scenarioId })
 				}
 			},
 		}),
