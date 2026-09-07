@@ -14,9 +14,11 @@ The submitted demo intentionally uses mock inference for reproducibility. The li
 
 ## Demo
 
-![Demo screenshot](docs/demo-placeholder.svg)
+![Overview — start the Apex Bank demo](docs/demo-overview.jpg)
 
-TODO: replace `docs/demo-placeholder.svg` with a short recording of Apex Bank impersonation.
+![Transfer Check — RM 8,000 paused at risk 94](docs/demo-transfer-check.jpg)
+
+Live deploy: https://scammesh-production.up.railway.app
 
 After the commands in [Run locally](#run-locally), open http://127.0.0.1:5173 and start Apex Bank impersonation. The app pages are Overview, Live Detection, Risk Signals, Transfer Check, and History.
 
