@@ -248,21 +248,28 @@ export function mapSimulationToUi(view: SimulationStateView, previous: ScamState
 		callTranscript: transcriptFromSession(view),
 		transfer: transferFromSession(view, previous.transfer),
 		overviewStats: {
-			riskSignals: signals.length,
-			needReview: signals.filter((item) => item.risk !== "low").length,
+			// Keep paper baseline on idle; never drop below seeded desk totals mid-demo.
+			riskSignals: Math.max(previous.overviewStats.riskSignals, signals.length),
+			needReview: Math.max(
+				previous.overviewStats.needReview,
+				signals.filter((item) => item.risk !== "low").length,
+			),
 			transfersProtected: previous.overviewStats.transfersProtected,
-			identityChecks: identitySignals,
+			identityChecks: Math.max(previous.overviewStats.identityChecks, identitySignals),
 		},
-		weekActivity: previous.weekActivity.map((day, index, list) =>
-			index === list.length - 1
-				? {
-						...day,
-						safe: signals.filter((item) => item.risk === "low").length,
-						review: signals.filter((item) => item.risk === "review").length,
-						high: signals.filter((item) => item.risk === "high").length,
-					}
-				: day,
-		),
+		weekActivity:
+			signals.length === 0
+				? previous.weekActivity
+				: previous.weekActivity.map((day, index, list) =>
+						index === list.length - 1
+							? {
+									...day,
+									safe: signals.filter((item) => item.risk === "low").length,
+									review: signals.filter((item) => item.risk === "review").length,
+									high: signals.filter((item) => item.risk === "high").length,
+								}
+							: day,
+					),
 		demoStatus: toDemoStatus(view.status),
 		demoElapsedMs: view.session.startedAt ? Math.max(0, Date.now() - view.session.startedAt) : previous.demoElapsedMs,
 	}

@@ -15,16 +15,26 @@ function channel(id: UiChannel, activity: string, timestamp = "00:00:00"): Chann
 	}
 }
 
+/** Paper desk baseline — decorative last-7-days bars for Overview, not live Mozaik facts. */
+const WEEK_SEED: Array<Pick<DayActivity, "safe" | "review" | "high">> = [
+	{ safe: 4, review: 1, high: 0 },
+	{ safe: 3, review: 2, high: 1 },
+	{ safe: 5, review: 1, high: 0 },
+	{ safe: 2, review: 3, high: 1 },
+	{ safe: 4, review: 2, high: 2 },
+	{ safe: 3, review: 1, high: 1 },
+	{ safe: 2, review: 2, high: 1 },
+]
+
 function currentWeek(): DayActivity[] {
 	const days: DayActivity[] = []
 	for (let offset = 6; offset >= 0; offset -= 1) {
 		const date = new Date()
 		date.setDate(date.getDate() - offset)
+		const seed = WEEK_SEED[6 - offset] ?? { safe: 0, review: 0, high: 0 }
 		days.push({
 			label: String(date.getDate()),
-			safe: 0,
-			review: 0,
-			high: 0,
+			...seed,
 		})
 	}
 	return days
@@ -82,10 +92,10 @@ export function createInitialState(): ScamState {
 		},
 		history: [],
 		overviewStats: {
-			riskSignals: 0,
-			needReview: 0,
-			transfersProtected: 0,
-			identityChecks: 0,
+			riskSignals: 12,
+			needReview: 5,
+			transfersProtected: 8,
+			identityChecks: 24,
 		},
 		weekActivity: currentWeek(),
 		demoStatus: "idle",

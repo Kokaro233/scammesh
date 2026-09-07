@@ -52,7 +52,7 @@ function runningView(risk = 42): SimulationStateView {
 }
 
 describe("scamReducer live session", () => {
-	it("starts quiet with no seeded metrics", () => {
+	it("starts with paper Overview seeds and an empty live desk", () => {
 		const state = createInitialState()
 		expect(state.signals).toEqual([])
 		expect(state.connections).toEqual([])
@@ -63,11 +63,12 @@ describe("scamReducer live session", () => {
 		expect(state.riskLevel).toBe("normal")
 		expect(state.stampVisible).toBe(false)
 		expect(state.overviewStats).toEqual({
-			riskSignals: 0,
-			needReview: 0,
-			transfersProtected: 0,
-			identityChecks: 0,
+			riskSignals: 12,
+			needReview: 5,
+			transfersProtected: 8,
+			identityChecks: 24,
 		})
+		expect(state.weekActivity.some((day) => day.safe + day.review + day.high > 0)).toBe(true)
 	})
 
 	it("hydrates risk and transcript from the live view", () => {
@@ -90,13 +91,13 @@ describe("scamReducer live session", () => {
 		state = scamReducer(state, { type: "PAUSE_TRANSFER_START" })
 		state = scamReducer(state, { type: "PAUSE_TRANSFER_FINISH" })
 		expect(state.transfer.status).toBe("paused")
-		expect(state.overviewStats.transfersProtected).toBe(1)
+		expect(state.overviewStats.transfersProtected).toBe(9)
 		expect(state.history[0]?.result).toBe("Paused")
 		expect(state.history[0]?.description).toBe("Apex Safe Holding")
 		state = scamReducer(state, { type: "HYDRATE", view: runningView(90) })
 		expect(state.transfer.status).toBe("paused")
 		expect(state.headline).toBe("Transfer paused")
-		expect(state.overviewStats.transfersProtected).toBe(1)
+		expect(state.overviewStats.transfersProtected).toBe(9)
 	})
 
 	it("records continue without treating it as a protected transfer", () => {
@@ -106,7 +107,7 @@ describe("scamReducer live session", () => {
 		state = scamReducer(state, { type: "CONTINUE_ANYWAY" })
 		expect(state.transfer.status).toBe("continued")
 		expect(state.history[0]?.result).toBe("Continued")
-		expect(state.overviewStats.transfersProtected).toBe(0)
+		expect(state.overviewStats.transfersProtected).toBe(8)
 	})
 
 	it("resets to a quiet desk without leftover transfer or history", () => {
@@ -119,7 +120,7 @@ describe("scamReducer live session", () => {
 		expect(state.signals).toHaveLength(0)
 		expect(state.transfer.visible).toBe(false)
 		expect(state.history).toEqual([])
-		expect(state.overviewStats.transfersProtected).toBe(0)
+		expect(state.overviewStats.transfersProtected).toBe(8)
 		expect(state.intervention).toBe("closed")
 	})
 

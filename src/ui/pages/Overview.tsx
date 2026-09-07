@@ -32,11 +32,11 @@ export function OverviewPage({ onStartDemo }: { onStartDemo: () => void }) {
 			<section className="ops-today" aria-label="Today">
 				<p className="ops-today-label">Today</p>
 				<div className="ops-today-metrics">
-					<Metric value={state.overviewStats.riskSignals} label="Risk signals" note="this session" />
+					<Metric value={state.overviewStats.riskSignals} label="Risk signals" note="desk total" />
 					<Metric
 						value={state.overviewStats.needReview}
 						label="Need review"
-						note={highPriority > 0 ? `${highPriority} high priority` : "this session"}
+						note={highPriority > 0 ? `${highPriority} high priority` : "desk total"}
 					/>
 					<Metric
 						value={state.overviewStats.transfersProtected}
@@ -44,10 +44,10 @@ export function OverviewPage({ onStartDemo }: { onStartDemo: () => void }) {
 						note={
 							state.transfer.status === "paused" && state.transfer.amount
 								? `${state.transfer.currency} ${state.transfer.amount}`
-								: "this session"
+								: "desk total"
 						}
 					/>
-					<Metric value={state.overviewStats.identityChecks} label="Identity checks" note="this session" />
+					<Metric value={state.overviewStats.identityChecks} label="Identity checks" note="desk total" />
 				</div>
 			</section>
 
@@ -55,7 +55,7 @@ export function OverviewPage({ onStartDemo }: { onStartDemo: () => void }) {
 				<div className="chart-head">
 					<div>
 						<h2 className="ops-heading">Risk activity</h2>
-						<p className="chart-range mono">This session</p>
+						<p className="chart-range mono">Last 7 days</p>
 					</div>
 					<p className="chart-key">
 						<span className="key-safe">Safe</span>
