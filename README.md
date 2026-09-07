@@ -112,6 +112,15 @@ On Windows PowerShell: `Copy-Item .env.example .env`
 
 Keep `MOCK_INFERENCE_MODE=true` and leave every `LLM_*` field empty.
 
+### Deploy a live demo (Railway)
+
+Vercel cannot run the Mozaik Express session. Use a Node host such as [Railway](https://railway.app):
+
+1. New project → Deploy from GitHub → `Kokaro233/scammesh`
+2. Build: `npm run build` · Start: `npm start`
+3. Set `MOCK_INFERENCE_MODE=true` (leave `LLM_*` empty)
+4. Open the generated `*.up.railway.app` URL — UI and `/api` share one process
+
 ```bash
 npm run typecheck
 npm run lint

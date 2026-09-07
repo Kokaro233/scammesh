@@ -1,7 +1,12 @@
+import path from "node:path"
+import { fileURLToPath } from "node:url"
 import express from "express"
 import { healthPayload } from "./health"
 import { createSimulationController } from "./simulation/controller"
 import { registerSimulationRoutes } from "./simulation/routes"
+
+const here = path.dirname(fileURLToPath(import.meta.url))
+const uiDist = path.resolve(here, "../../ui")
 
 export function createApp(controller = createSimulationController()) {
 	const app = express()
@@ -10,5 +15,15 @@ export function createApp(controller = createSimulationController()) {
 		res.json(healthPayload())
 	})
 	registerSimulationRoutes(app, controller)
+
+	app.use(express.static(uiDist, { index: false, fallthrough: true }))
+	app.get(/^(?!\/api(?:\/|$)|\/health$|\/state$|\/reset$).*/, (_req, res, next) => {
+		res.sendFile(path.join(uiDist, "index.html"), (error) => {
+			if (error) {
+				next()
+			}
+		})
+	})
+
 	return app
 }
