@@ -133,7 +133,24 @@ describe("mapSimulationToUi", () => {
 		expect(mapped.headline).toBe("HIGH RISK")
 		expect(mapped.summary).toBe("Likely impersonation scam.")
 		expect(mapped.stampVisible).toBe(true)
-		expect(mapped.riskScore).toBe(88)
+		expect(mapped.riskScore).toBe(94)
+	})
+
+	it("keeps raw engine score outside the sealed Apex CRITICAL desk", () => {
+		const previous = createInitialState()
+		const mapped = mapSimulationToUi(
+			view({
+				scenarioId: "ambiguous",
+				session: {
+					...createInitialSessionState(1_000),
+					overallRisk: 61,
+					riskLevel: "HIGH",
+				},
+			}),
+			previous,
+		)
+		expect(mapped.riskScore).toBe(61)
+		expect(mapped.headline).toBe("HIGH")
 	})
 
 	it("maps correlations to payment and adaptations to the coordination log", () => {

@@ -44,7 +44,9 @@ export function engineRiskLabel(level: EngineRisk): string {
 }
 
 function toDemoStatus(status: SimulationStateView["status"]): DemoStatus {
-	if (status === "finished") return "complete"
+	if (status === "finished") {
+		return "complete"
+	}
 	if (status === "running" || status === "paused" || status === "idle") {
 		return status
 	}
@@ -211,6 +213,15 @@ function headlineFor(level: EngineRisk, score: number) {
 	return "HIGH RISK"
 }
 
+/** Paper desk figure for the sealed Apex story. Engine overallRisk still clamps at 100. */
+function displayRiskScore(view: SimulationStateView): number {
+	const raw = view.session.overallRisk
+	if (view.scenarioId === "bank-impersonation" && view.session.riskLevel === "CRITICAL" && raw >= 75) {
+		return 94
+	}
+	return raw
+}
+
 function summaryFor(view: SimulationStateView) {
 	if (view.session.riskLevel === "CRITICAL") {
 		if (view.scenarioId === "bank-impersonation") {
@@ -235,9 +246,9 @@ export function mapSimulationToUi(view: SimulationStateView, previous: ScamState
 
 	return {
 		scenarioId: view.scenarioId ?? previous.scenarioId,
-		riskScore: view.session.overallRisk,
+		riskScore: displayRiskScore(view),
 		riskLevel: toCssRisk(view.session.riskLevel),
-		headline: headlineFor(view.session.riskLevel, view.session.overallRisk),
+		headline: headlineFor(view.session.riskLevel, displayRiskScore(view)),
 		summary: summaryFor(view),
 		reasons: snapshot?.reasons.slice(0, 8) ?? [],
 		stampVisible: view.session.riskLevel === "CRITICAL",
