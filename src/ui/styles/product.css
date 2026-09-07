@@ -230,7 +230,7 @@
 	position: relative;
 	width: 252px;
 	min-height: 378px;
-	background: var(--bg-paper);
+	background: transparent;
 	aspect-ratio: 1024 / 1536;
 	flex-shrink: 0;
 	filter: drop-shadow(0 10px 24px rgba(32, 32, 29, 0.08));
