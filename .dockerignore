@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.env
+.env.*
+coverage
+*.log
+.DS_Store
+Thumbs.db
+.vite
+_plan_extract
+_vendor
+*.mp4
+*.webm
+screen-recordings
+.cursor
+docs/demo-placeholder.svg
