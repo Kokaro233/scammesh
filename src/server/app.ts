@@ -1,12 +1,10 @@
 import path from "node:path"
-import { fileURLToPath } from "node:url"
 import express from "express"
 import { healthPayload } from "./health"
 import { createSimulationController } from "./simulation/controller"
 import { registerSimulationRoutes } from "./simulation/routes"
 
-const here = path.dirname(fileURLToPath(import.meta.url))
-const uiDist = path.resolve(here, "../../ui")
+const uiDist = path.resolve(process.cwd(), "dist/ui")
 
 export function createApp(controller = createSimulationController()) {
 	const app = express()
