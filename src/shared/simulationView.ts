@@ -1,5 +1,5 @@
 import type { AgentCardView } from "./agentCard"
-import type { AgentId, ScenarioId, SessionState } from "./types"
+import type { AgentId, CallUtterance, ScenarioId, SessionState, TransactionIntent } from "./types"
 
 export type SimulationStatus = "idle" | "running" | "paused" | "finished"
 
@@ -14,6 +14,8 @@ export interface SimulationStateView {
 	session: SessionState
 	loops: Record<AgentId, ChannelLoopView>
 	agents: AgentCardView[]
+	callTranscript: CallUtterance[]
+	transactionIntents: TransactionIntent[]
 }
 
 export type { AgentCardView } from "./agentCard"

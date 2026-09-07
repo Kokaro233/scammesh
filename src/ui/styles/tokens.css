@@ -1,0 +1,68 @@
+:root {
+	color-scheme: light;
+
+	--bg-app: #f4f1ea;
+	--bg-paper: #fffdf8;
+	--bg-soft: #f7f4ee;
+	--bg-active: #f3e4e1;
+
+	--text-primary: #20201d;
+	--text-secondary: #706a62;
+	--text-muted: #9b958d;
+
+	--border: #d8d2c8;
+	--border-light: #e6e1d9;
+
+	--risk-red: #b54b4a;
+	--risk-red-deep: #963536;
+	--risk-red-soft: #f4dfdc;
+
+	--warning: #bd8b3b;
+	--warning-soft: #f5e9ce;
+
+	--safe: #56836a;
+	--safe-soft: #dfece3;
+
+	--financial-bluegray: #92a6ae;
+
+	--font-sans: "Inter", system-ui, "Segoe UI", sans-serif;
+	--font-serif: "DM Serif Display", "Source Serif 4", "Times New Roman", serif;
+	--font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
+
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 20px;
+	--space-6: 24px;
+	--space-8: 32px;
+	--space-10: 40px;
+
+	--radius-sm: 4px;
+	--radius-md: 6px;
+	--radius-lg: 8px;
+
+	--shadow-quiet: 0 1px 1px rgba(32, 32, 29, 0.04);
+	--shadow-slip: 0 1px 2px rgba(32, 32, 29, 0.06), 0 6px 16px rgba(32, 32, 29, 0.05);
+
+	--sidebar-width: 200px;
+	--header-height: 56px;
+	--strip-height: 36px;
+
+	--duration-fast: 150ms;
+	--duration-page: 180ms;
+	--duration-stamp: 220ms;
+	--duration-connection: 420ms;
+	--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+	--text: var(--text-primary);
+	--muted: var(--text-secondary);
+	--bg: var(--bg-app);
+	--bg-elevated: var(--bg-paper);
+	--line: var(--border);
+	--accent: var(--financial-bluegray);
+	--watch: var(--warning);
+	--high: var(--risk-red);
+	--critical: var(--risk-red-deep);
+	--ok: var(--safe);
+}

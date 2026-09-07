@@ -1,31 +1,3 @@
-:root {
-	color-scheme: dark;
-	--bg: #12151c;
-	--bg-elevated: #1a1f2a;
-	--line: #2b3344;
-	--text: #edf1f7;
-	--muted: #9aa6b8;
-	--accent: #7aa2ff;
-	--watch: #e3b341;
-	--high: #e07a3d;
-	--critical: #e25b6a;
-	--ok: #3fbf8f;
-	font-family: "Segoe UI", sans-serif;
-}
-
-* {
-	box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-	margin: 0;
-	min-height: 100%;
-	background: var(--bg);
-	color: var(--text);
-}
-
 button,
 select {
 	font: inherit;

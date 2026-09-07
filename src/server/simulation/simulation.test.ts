@@ -92,7 +92,22 @@ describe("live simulation controller", () => {
 		expect(controller.listenerCount()).toBe(0)
 	})
 
-	it("exposes start, state, and reset over HTTP", async () => {
+	it("pauses feed inject without disposing the session and resumes the same session", async () => {
+		const controller = live()
+		const started = controller.start({ scenarioId: "bank-impersonation", speed: 20 })
+		const sessionId = started.session.sessionId
+		expect(started.status).toBe("running")
+
+		const paused = controller.pause()
+		expect(paused.status).toBe("paused")
+		expect(paused.session.sessionId).toBe(sessionId)
+
+		const resumed = controller.resume()
+		expect(resumed.status).toBe("running")
+		expect(resumed.session.sessionId).toBe(sessionId)
+	})
+
+	it("exposes start, pause, resume, and reset over HTTP", async () => {
 		const controller = live()
 		const app = createApp(controller)
 		const server = app.listen(0)
@@ -101,14 +116,30 @@ describe("live simulation controller", () => {
 		const started = await fetch(`http://127.0.0.1:${port}/api/simulation/start`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ scenarioId: "benign-bank", speed: 40 }),
+			body: JSON.stringify({ scenarioId: "benign-bank", speed: 40, identityDelay: true }),
 		})
 		expect(started.ok).toBe(true)
-		const body = (await started.json()) as { agents: unknown[] }
+		const body = (await started.json()) as { agents: unknown[]; status: string }
 		expect(body.agents).toHaveLength(6)
+		expect(body.status).toBe("running")
+
+		const paused = await fetch(`http://127.0.0.1:${port}/api/simulation/pause`, { method: "POST" })
+		expect(((await paused.json()) as { status: string }).status).toBe("paused")
+
+		const resumed = await fetch(`http://127.0.0.1:${port}/api/simulation/resume`, { method: "POST" })
+		expect(((await resumed.json()) as { status: string }).status).toBe("running")
 
 		const state = (await (await fetch(`http://127.0.0.1:${port}/state`)).json()) as { status: string }
 		expect(state.status).toBe("running")
+
+		const health = (await (await fetch(`http://127.0.0.1:${port}/health`)).json()) as {
+			inferenceMode: string
+			mozaikRuntime: string
+			agentCount: number
+		}
+		expect(health.mozaikRuntime).toBe("active")
+		expect(health.agentCount).toBe(6)
+		expect(["mock", "live"]).toContain(health.inferenceMode)
 
 		await fetch(`http://127.0.0.1:${port}/reset`, { method: "POST" })
 		await new Promise<void>((resolve, reject) => {

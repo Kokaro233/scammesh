@@ -1,4 +1,5 @@
 import type { Express, Response } from "express"
+import { healthPayload } from "../health"
 import { loadAllScenarios } from "../../scenarios/loadScenario"
 import type { ScenarioId } from "../../shared/types"
 import type { SimulationController } from "./controller"
@@ -8,7 +9,7 @@ function writeSse(res: Response, event: unknown) {
 }
 
 export function registerSimulationRoutes(app: Express, controller: SimulationController) {
-	const start = (req: { body?: { scenarioId?: ScenarioId; speed?: number } }, res: Response) => {
+	const start = (req: { body?: { scenarioId?: ScenarioId; speed?: number; identityDelay?: boolean } }, res: Response) => {
 		try {
 			res.json(controller.start(req.body ?? {}))
 		} catch (error) {
@@ -27,6 +28,15 @@ export function registerSimulationRoutes(app: Express, controller: SimulationCon
 	app.post("/api/simulation/start", start)
 	app.post("/api/simulation/pause", (_req, res) => {
 		res.json(controller.pause())
+	})
+	app.post("/api/simulation/resume", (_req, res) => {
+		res.json(controller.resume())
+	})
+	app.get("/api/system/status", (_req, res) => {
+		res.json({
+			...healthPayload(),
+			session: controller.view().status,
+		})
 	})
 	app.post("/api/simulation/reset", reset)
 	app.post("/reset", reset)

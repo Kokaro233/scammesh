@@ -1,6 +1,6 @@
 import { createScamSession } from "../../runtime/createScamSession"
 import { loadScenario } from "../../scenarios/loadScenario"
-import { SCENARIO_IDS, type ScenarioId } from "../../shared/types"
+import { SCENARIO_IDS, type ScenarioFeedItem, type ScenarioId } from "../../shared/types"
 import type { SimulationStateView, SimulationStatus } from "../../shared/simulationView"
 import type { UiEvent } from "../../shared/uiEvents"
 import { injectScenarioFeed } from "./injectFeed"
@@ -10,6 +10,7 @@ import { idleSimulationView, toSimulationView } from "./publicState"
 export interface StartSimulationInput {
 	scenarioId?: ScenarioId
 	speed?: number
+	identityDelay?: boolean
 }
 
 type LiveSession = ReturnType<typeof createScamSession>
@@ -18,6 +19,11 @@ export class SimulationController {
 	private session: LiveSession | null = null
 	private status: SimulationStatus = "idle"
 	private scenarioId: ScenarioId | null = null
+	private speed = 1
+	private identityDelay = false
+	private clockStart = 0
+	private elapsedMs = 0
+	private injected = new Set<string>()
 	private timers: ReturnType<typeof setTimeout>[] = []
 	private poll: ReturnType<typeof setInterval> | null = null
 	private listeners = new Set<(event: UiEvent) => void>()
@@ -47,11 +53,15 @@ export class SimulationController {
 			throw new Error(`Unknown scenario: ${scenarioId}`)
 		}
 
-		const speed = input.speed && input.speed > 0 ? input.speed : 1
 		this.clearRuntime()
 		this.session = createScamSession()
 		this.scenarioId = scenarioId
+		this.speed = input.speed && input.speed > 0 ? input.speed : 1
+		this.identityDelay = Boolean(input.identityDelay)
 		this.status = "running"
+		this.elapsedMs = 0
+		this.clockStart = Date.now()
+		this.injected = new Set()
 		this.resetCursors()
 
 		const runtime = this.session.resolveRuntime()
@@ -60,38 +70,8 @@ export class SimulationController {
 		this.session.start()
 		this.emit({ kind: "started", scenarioId, at: Date.now() })
 		this.flush()
-
-		const scenario = loadScenario(scenarioId)
-		for (const feed of scenario.feeds) {
-			const delay = Math.max(0, Math.floor(feed.timestampOffsetMs / speed))
-			this.timers.push(
-				setTimeout(() => {
-					if (!this.session || this.status !== "running") {
-						return
-					}
-					injectScenarioFeed(this.session, feed)
-					this.flush()
-				}, delay),
-			)
-		}
-
-		const lastDelay = Math.max(0, ...scenario.feeds.map((feed) => Math.floor(feed.timestampOffsetMs / speed)))
-		this.timers.push(
-			setTimeout(() => {
-				if (this.status === "running") {
-					this.flush()
-					this.status = "finished"
-					this.emit({ kind: "finished", at: Date.now() })
-				}
-			}, lastDelay + 400),
-		)
-
-		this.poll = setInterval(() => {
-			if (this.status === "running" || this.status === "finished") {
-				this.flush()
-			}
-		}, 50)
-
+		this.scheduleRemaining()
+		this.ensurePoll()
 		return this.view()
 	}
 
@@ -99,8 +79,21 @@ export class SimulationController {
 		if (this.status !== "running") {
 			return this.view()
 		}
-		this.clearTimers()
+		this.elapsedMs = Date.now() - this.clockStart
+		this.clearFeedTimers()
 		this.status = "paused"
+		this.flush()
+		return this.view()
+	}
+
+	resume() {
+		if (this.status !== "paused" || !this.session || !this.scenarioId) {
+			return this.view()
+		}
+		this.status = "running"
+		this.clockStart = Date.now() - this.elapsedMs
+		this.scheduleRemaining()
+		this.ensurePoll()
 		this.flush()
 		return this.view()
 	}
@@ -109,9 +102,51 @@ export class SimulationController {
 		this.clearRuntime()
 		this.status = "idle"
 		this.scenarioId = null
+		this.elapsedMs = 0
+		this.injected = new Set()
 		this.resetCursors()
 		this.emit({ kind: "reset", at: Date.now() })
 		return idleSimulationView()
+	}
+
+	private feedDelay(feed: ScenarioFeedItem) {
+		const extra = this.identityDelay && feed.sourceChannel === "identity" ? 4_000 : 0
+		return Math.max(0, Math.floor((feed.timestampOffsetMs + extra) / this.speed))
+	}
+
+	private scheduleRemaining() {
+		if (!this.scenarioId) {
+			return
+		}
+
+		const scenario = loadScenario(this.scenarioId)
+		for (const feed of scenario.feeds) {
+			if (this.injected.has(feed.feedId)) {
+				continue
+			}
+			const delay = this.feedDelay(feed) - this.elapsedMs
+			this.timers.push(
+				setTimeout(() => {
+					if (!this.session || this.status !== "running") {
+						return
+					}
+					this.injected.add(feed.feedId)
+					injectScenarioFeed(this.session, feed)
+					this.flush()
+				}, Math.max(0, delay)),
+			)
+		}
+
+		const lastDelay = Math.max(0, ...scenario.feeds.map((feed) => this.feedDelay(feed)))
+		this.timers.push(
+			setTimeout(() => {
+				if (this.status === "running") {
+					this.flush()
+					this.status = "finished"
+					this.emit({ kind: "finished", at: Date.now() })
+				}
+			}, Math.max(0, lastDelay + 400 - this.elapsedMs)),
+		)
 	}
 
 	private emit(event: UiEvent) {
@@ -161,11 +196,26 @@ export class SimulationController {
 		this.observationCursor = 0
 	}
 
-	private clearTimers() {
+	private ensurePoll() {
+		if (this.poll) {
+			return
+		}
+		this.poll = setInterval(() => {
+			if (this.status === "running" || this.status === "paused" || this.status === "finished") {
+				this.flush()
+			}
+		}, 50)
+	}
+
+	private clearFeedTimers() {
 		for (const timer of this.timers) {
 			clearTimeout(timer)
 		}
 		this.timers = []
+	}
+
+	private clearTimers() {
+		this.clearFeedTimers()
 		if (this.poll) {
 			clearInterval(this.poll)
 			this.poll = null

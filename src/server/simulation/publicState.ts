@@ -47,6 +47,8 @@ export function idleSimulationView(): SimulationStateView {
 		session: createInitialSessionState(),
 		loops: emptyLoops(),
 		agents: buildAgentCards(),
+		callTranscript: [],
+		transactionIntents: [],
 	}
 }
 
@@ -72,5 +74,7 @@ export function toSimulationView(
 			identity: state.loops.identity,
 		},
 		agents: buildAgentCards(state),
+		callTranscript: [...state.callTranscript],
+		transactionIntents: [...state.transactionIntents],
 	}
 }
