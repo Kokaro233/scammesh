@@ -18,7 +18,7 @@ The submitted demo intentionally uses mock inference for reproducibility. The li
 
 ![Transfer Check — RM 8,000 paused at risk 94](docs/demo-transfer-check.jpg)
 
-Live deploy: https://scammesh-production.up.railway.app
+Live deploy: https://scammesh.onrender.com
 
 After the commands in [Run locally](#run-locally), open http://127.0.0.1:5173 and start Apex Bank impersonation. The app pages are Overview, Live Detection, Risk Signals, Transfer Check, and History.
 
