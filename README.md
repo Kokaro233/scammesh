@@ -114,14 +114,13 @@ On Windows PowerShell: `Copy-Item .env.example .env`
 
 Keep `MOCK_INFERENCE_MODE=true` and leave every `LLM_*` field empty.
 
-### Deploy a live demo (Railway)
+### Deploy a live demo (Render)
 
-Vercel cannot run the Mozaik Express session. Use a Node host such as [Railway](https://railway.app):
+Vercel cannot run the Mozaik Express session: the demo keeps agent state in memory and streams it over SSE, and a serverless function does not share that process across requests. Use a single long-running Node host. [Render](https://render.com) has a free web service (512 MB, sleeps after 15 minutes without traffic, 750 hours a month).
 
-1. New project → Deploy from GitHub → `Kokaro233/scammesh`
-2. Build: `npm run build` · Start: `npm start`
-3. Set `MOCK_INFERENCE_MODE=true` (leave `LLM_*` empty)
-4. Open the generated `*.up.railway.app` URL — UI and `/api` share one process
+`render.yaml` is already in the repo. From the Render dashboard: New → Blueprint → connect `Kokaro233/scammesh`. Render builds the Dockerfile, sets `MOCK_INFERENCE_MODE=true`, and serves the UI and `/api` from one process. Health check: `/health`.
+
+The first request after a sleep takes about a minute while the free instance wakes up.
 
 ```bash
 npm run typecheck

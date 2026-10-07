@@ -1,0 +1,18 @@
+# Free Render web service. One process serves the Vite UI and the Mozaik Express session.
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: scammesh
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: main
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: MOCK_INFERENCE_MODE
+        value: "true"
+      - key: NODE_ENV
+        value: production

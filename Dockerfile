@@ -11,6 +11,6 @@ COPY . .
 RUN npm run build:docker
 
 ENV NODE_ENV=production
-ENV PORT=3000
+# The host injects PORT (Render uses 10000). The server already defaults to 3000.
 EXPOSE 3000
 CMD ["npx", "tsx", "src/server/index.ts"]
